@@ -225,10 +225,20 @@
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
 
+                <!-- UPLOAD FOTO DENGAN INPUT FILE -->
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Link Foto (Google Drive URL)</label>
-                    <input type="url" id="inputFoto" placeholder="https://drive.google.com/file/d/..." 
-                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Upload Foto Mahasiswa</label>
+                    <input type="file" id="inputFoto" accept="image/*" onchange="previewImage(event)" 
+                        class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-300 rounded-lg cursor-pointer">
+                    
+                    <!-- Area Pratinjau Foto -->
+                    <div id="imagePreviewContainer" class="mt-3 hidden flex items-center gap-3 p-2 bg-slate-50 rounded-lg border border-slate-200">
+                        <img id="imagePreview" src="#" alt="Pratinjau Foto" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-500">
+                        <div>
+                            <p class="text-xs font-medium text-slate-700" id="imageFileName">Foto dipilih</p>
+                            <p class="text-[10px] text-slate-400">Siap diunggah</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
@@ -247,22 +257,59 @@
 
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
-        // 1. URL Web App Google Apps Script Anda (GANTI DENGAN URL APPS SCRIPT ANDA)
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwVuF9sRqFfQVxjHw224Xaz4aYO8We92Uk4n_GoNa8dfPkga7nXageH7YdZq60BGkhs/exec';
+        // 1. URL Web App Google Apps Script (GANTI DENGAN URL WEB APP APPS SCRIPT ANDA)
+        const scriptURL = 'GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA';
 
         let rawStudentData = [];
 
-        // Helper function: Ekstrak ID dari Google Drive URL
+        // Helper: Format Direct Drive Image CDN
         function getDirectDriveImageUrl(url) {
             if (!url) return null;
             const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
             if (match && match[1]) {
-                return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w300`;
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
             }
             return url;
         }
 
-        // 2. Authentication Logic
+        // Helper: Membaca File Gambar & Konversi ke Base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve({
+                        base64: base64,
+                        type: file.type,
+                        name: file.name
+                    });
+                };
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Pratinjau Foto sebelum diupload
+        function previewImage(event) {
+            const input = event.target;
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
+            const fileName = document.getElementById('imageFileName');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    fileName.textContent = input.files[0].name;
+                    container.classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Authentication Logic
         function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('username').value;
@@ -293,7 +340,7 @@
             loadData();
         }
 
-        // 3. Fetch Data from Google Sheets
+        // Fetch Data dari Google Sheets
         function loadData() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = `
@@ -328,7 +375,7 @@
                 });
         }
 
-        // 4. Render Table Row (Foto berada di dalam kolom Nama)
+        // Render Tabel (Foto di samping nama)
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -375,14 +422,14 @@
             });
         }
 
-        // 5. Update Stats
+        // Stats Update
         function updateStats(data) {
             document.getElementById('statTotal').textContent = data.length;
             const prodiSet = new Set(data.map(d => d.Prodi).filter(Boolean));
             document.getElementById('statProdi').textContent = prodiSet.size;
         }
 
-        // 6. Client-side Search Filter
+        // Search Filter
         function filterData() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = rawStudentData.filter(item => 
@@ -393,7 +440,7 @@
             renderTable(filtered);
         }
 
-        // 7. Modal Control & Submit
+        // Modal Control
         function openModal() {
             document.getElementById('dataModal').classList.remove('hidden');
         }
@@ -401,38 +448,50 @@
         function closeModal() {
             document.getElementById('dataModal').classList.add('hidden');
             document.getElementById('addForm').reset();
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
         }
 
-        function submitData(e) {
+        // Process Upload & Submit
+        async function submitData(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah...`;
 
-            const formData = new FormData();
-            formData.append('Nama', document.getElementById('inputNama').value);
-            formData.append('NIM', document.getElementById('inputNIM').value);
-            formData.append('Prodi', document.getElementById('inputProdi').value);
-            formData.append('Kelas', document.getElementById('inputKelas').value);
-            formData.append('Foto', document.getElementById('inputFoto').value);
+            try {
+                const fileInput = document.getElementById('inputFoto');
+                let fileObj = null;
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(res => {
-                    closeModal();
-                    loadData();
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Gagal menyimpan data.');
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `Simpan Data`;
+                if (fileInput.files.length > 0) {
+                    fileObj = await readFileAsBase64(fileInput.files[0]);
+                }
+
+                const payload = {
+                    Nama: document.getElementById('inputNama').value,
+                    NIM: document.getElementById('inputNIM').value,
+                    Prodi: document.getElementById('inputProdi').value,
+                    Kelas: document.getElementById('inputKelas').value,
+                    fileData: fileObj ? fileObj.base64 : '',
+                    fileType: fileObj ? fileObj.type : '',
+                    fileName: fileObj ? fileObj.name : ''
+                };
+
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
                 });
+
+                closeModal();
+                loadData();
+            } catch (err) {
+                console.error(err);
+                alert('Gagal menyimpan data.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `Simpan Data`;
+            }
         }
 
-        // Check authentication on page load
         checkAuth();
     </script>
 </body>

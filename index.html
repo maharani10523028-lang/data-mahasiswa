@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Akademik - Data Mahasiswa</title>
+    <title>Manajemen Data Mahasiswa - Update & Hapus</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -20,10 +20,10 @@
         <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 mb-4 shadow-inner">
-                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                    <i class="fa-solid fa-user-gear text-3xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800">Portal Akademik</h2>
-                <p class="text-slate-500 text-sm mt-1">Masuk untuk mengelola data mahasiswa</p>
+                <h2 class="text-2xl font-bold text-slate-800">Portal Kelola Data</h2>
+                <p class="text-slate-500 text-sm mt-1">Sistem Update & Hapus Data Mahasiswa</p>
             </div>
 
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
@@ -34,7 +34,7 @@
                             <i class="fa-solid fa-user"></i>
                         </span>
                         <input type="text" id="username" required placeholder="Masukkan username" 
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                     </div>
                 </div>
 
@@ -45,7 +45,7 @@
                             <i class="fa-solid fa-lock"></i>
                         </span>
                         <input type="password" id="password" required placeholder="••••••••" 
-                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                     </div>
                 </div>
 
@@ -54,114 +54,59 @@
                 </div>
 
                 <button type="submit" 
-                    class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center gap-2">
-                    <span>Masuk ke Dashboard</span>
+                    class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition flex items-center justify-center gap-2">
+                    <span>Masuk ke Sistem</span>
                     <i class="fa-solid fa-arrow-right text-sm"></i>
                 </button>
             </form>
-
-            <div class="mt-6 text-center text-xs text-slate-400">
-                <p>Default Login: <span class="font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">admin</span> / <span class="font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">admin123</span></p>
-            </div>
         </div>
     </div>
 
-    <!-- ================= DASHBOARD WEB ================= -->
+    <!-- ================= DASHBOARD UTAMA ================= -->
     <div id="dashboardApp" class="hidden min-h-screen flex flex-col">
-        <!-- Top Navbar -->
+        <!-- Navbar -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
-                        <i class="fa-solid fa-university"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-slate-800 text-base leading-tight">Siakad Mahasiswa</h1>
-                        <p class="text-xs text-slate-500">Google Sheets Database Integration</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <div class="hidden sm:flex items-center gap-2 text-sm text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full">
-                        <i class="fa-solid fa-user-circle text-indigo-600 text-base"></i>
-                        <span id="userDisplayName" class="font-medium">Administrator</span>
-                    </div>
-                    <button onclick="handleLogout()" 
-                        class="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Keluar</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-            
-            <!-- Stat Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Mahasiswa</p>
-                        <h3 id="statTotal" class="text-2xl font-bold text-slate-800 mt-0.5">0</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Program Studi</p>
-                        <h3 id="statProdi" class="text-2xl font-bold text-slate-800 mt-0.5">0</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
                         <i class="fa-solid fa-database"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Status Database</p>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 mt-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected
-                        </span>
+                        <h1 class="font-bold text-slate-800 text-base leading-tight">Kelola Data Mahasiswa</h1>
+                        <p class="text-xs text-slate-500">Google Sheets Integration (Update & Hapus)</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Action Toolbar & Table Card -->
+                <button onclick="handleLogout()" 
+                    class="text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <!-- Toolbar Header -->
                 <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800">Daftar Mahasiswa</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Kelola informasi data pribadi dan akademik mahasiswa</p>
+                        <h2 class="text-lg font-bold text-slate-800">Daftar Data Mahasiswa</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Pilih tombol aksi untuk melakukan Update atau Hapus Data</p>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <!-- Search Bar -->
-                        <div class="relative flex-1 sm:w-64">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                            </span>
-                            <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari Nama/NIM..." 
-                                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
-                        </div>
-
-                        <!-- Add Data Button -->
-                        <button onclick="openAddModal()" 
-                            class="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow transition flex items-center gap-2 whitespace-nowrap">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                            <span>Tambah Data</span>
-                        </button>
+                    <!-- Search Input -->
+                    <div class="relative sm:w-72">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </span>
+                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari Nama / NIM..." 
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                     </div>
                 </div>
 
-                <!-- Table Content -->
+                <!-- Table -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-semibold tracking-wider border-b border-slate-200">
@@ -170,14 +115,14 @@
                                 <th class="px-6 py-3.5">NIM</th>
                                 <th class="px-6 py-3.5">Program Studi</th>
                                 <th class="px-6 py-3.5">Kelas</th>
-                                <th class="px-6 py-3.5 text-center">Aksi</th>
+                                <th class="px-6 py-3.5 text-center">Aksi (Update / Hapus)</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-slate-200 bg-white">
                             <tr>
                                 <td colspan="5" class="px-6 py-8 text-center text-slate-400">
                                     <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-indigo-600"></i>
-                                    <p class="text-sm font-medium">Memuat data mahasiswa...</p>
+                                    <p class="text-sm font-medium">Memuat data dari Google Sheets...</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -187,61 +132,51 @@
         </main>
     </div>
 
-    <!-- ================= MODAL TAMBAH / EDIT DATA ================= -->
-    <div id="dataModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+    <!-- ================= MODAL UPDATE DATA ================= -->
+    <div id="updateModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg border border-slate-100 overflow-hidden transform transition-all">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <h3 id="modalTitle" class="font-bold text-slate-800 flex items-center gap-2">
-                    <i id="modalIcon" class="fa-solid fa-user-plus text-indigo-600"></i>
-                    <span id="modalTitleText">Tambah Data Mahasiswa</span>
+            <div class="px-6 py-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+                <h3 class="font-bold text-amber-900 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-amber-600"></i>
+                    <span>Update Data Mahasiswa</span>
                 </h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <form id="addForm" onsubmit="submitData(event)" class="p-6 space-y-4">
+            <form id="updateForm" onsubmit="submitUpdate(event)" class="p-6 space-y-4">
                 <input type="hidden" id="editOriginalNIM" value="">
 
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="inputNama" required placeholder="Contoh: Adel" 
+                    <input type="text" id="inputNama" required 
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">NIM</label>
-                        <input type="text" id="inputNIM" required placeholder="Contoh: 10523028" 
+                        <input type="text" id="inputNIM" required 
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-700 mb-1">Kelas</label>
-                        <input type="text" id="inputKelas" required placeholder="Contoh: IS-1" 
+                        <input type="text" id="inputKelas" required 
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Program Studi</label>
-                    <input type="text" id="inputProdi" required placeholder="Contoh: Sistem Informasi" 
+                    <input type="text" id="inputProdi" required 
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
 
-                <!-- UPLOAD FOTO DENGAN INPUT FILE -->
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Upload Foto Mahasiswa <span id="photoNote" class="text-slate-400 font-normal">(Opsional saat edit)</span></label>
-                    <input type="file" id="inputFoto" accept="image/*" onchange="previewImage(event)" 
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Update Foto <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                    <input type="file" id="inputFoto" accept="image/*" 
                         class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-300 rounded-lg cursor-pointer">
-                    
-                    <!-- Area Pratinjau Foto -->
-                    <div id="imagePreviewContainer" class="mt-3 hidden flex items-center gap-3 p-2 bg-slate-50 rounded-lg border border-slate-200">
-                        <img id="imagePreview" src="#" alt="Pratinjau Foto" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-500">
-                        <div>
-                            <p class="text-xs font-medium text-slate-700" id="imageFileName">Foto dipilih</p>
-                            <p class="text-[10px] text-slate-400">Siap diunggah</p>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
@@ -250,22 +185,21 @@
                         Batal
                     </button>
                     <button type="submit" id="submitBtn" 
-                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
-                        <span id="submitBtnText">Simpan Data</span>
+                        class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
+                        <span>Update Data</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <!-- ================= JAVASCRIPT ================= -->
     <script>
+        // Masukkan URL Web App Apps Script Anda disini
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwVuF9sRqFfQVxjHw224Xaz4aYO8We92Uk4n_GoNa8dfPkga7nXageH7YdZq60BGkhs/exec';
 
         let rawStudentData = [];
-        let isEditMode = false;
 
-        // Helper: Format Direct Drive Image CDN
         function getDirectDriveImageUrl(url) {
             if (!url) return null;
             const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -275,14 +209,12 @@
             return url;
         }
 
-        // Helper: Membaca File Gambar & Konversi ke Base64
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => {
-                    const base64 = reader.result.split(',')[1];
                     resolve({
-                        base64: base64,
+                        base64: reader.result.split(',')[1],
                         type: file.type,
                         name: file.name
                     });
@@ -292,27 +224,7 @@
             });
         }
 
-        // Pratinjau Foto
-        function previewImage(event) {
-            const input = event.target;
-            const container = document.getElementById('imagePreviewContainer');
-            const preview = document.getElementById('imagePreview');
-            const fileName = document.getElementById('imageFileName');
-
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    fileName.textContent = input.files[0].name;
-                    container.classList.remove('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                container.classList.add('hidden');
-            }
-        }
-
-        // Authentication Logic
+        // Authentication
         function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('username').value;
@@ -361,30 +273,23 @@
                     if (result.data) {
                         rawStudentData = result.data;
                         renderTable(rawStudentData);
-                        updateStats(rawStudentData);
                     } else {
                         tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-amber-600">Tidak ada data ditemukan.</td></tr>`;
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-6 text-center text-red-500 font-medium">
-                                Gagal mengambil data. Pastikan URL Apps Script sudah benar & izin akses diset 'Anyone'.
-                            </td>
-                        </tr>
-                    `;
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-red-500 font-medium">Gagal memuat data dari spreadsheet.</td></tr>`;
                 });
         }
 
-        // Render Tabel dengan Tombol Edit & Hapus
+        // Render Tabel
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400">Data mahasiswa tidak cocok dengan pencarian.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400">Data tidak ditemukan.</td></tr>`;
                 return;
             }
 
@@ -396,13 +301,8 @@
                 const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.Nama || 'Mahasiswa')}&background=e0e7ff&color=3730a3&bold=true`;
 
                 const fotoElement = directImgUrl 
-                    ? `<a href="${item.Foto}" target="_blank" title="Buka di Google Drive" class="inline-block shrink-0 group">
-                        <img src="${directImgUrl}" 
-                             alt="${item.Nama}" 
-                             class="w-10 h-10 rounded-full object-cover border-2 border-indigo-200 group-hover:border-indigo-600 shadow-sm transition transform group-hover:scale-105"
-                             onerror="this.onerror=null; this.src='${defaultAvatar}';">
-                       </a>`
-                    : `<img src="${defaultAvatar}" alt="${item.Nama}" class="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0">`;
+                    ? `<img src="${directImgUrl}" alt="${item.Nama}" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-200" onerror="this.onerror=null; this.src='${defaultAvatar}';">`
+                    : `<img src="${defaultAvatar}" alt="${item.Nama}" class="w-10 h-10 rounded-full object-cover border border-slate-200">`;
 
                 tr.innerHTML = `
                     <td class="px-6 py-3 flex items-center gap-3">
@@ -422,11 +322,17 @@
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button onclick="openEditModal('${item.NIM}')" title="Edit Data" class="p-2 text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition">
+                            <!-- TOMBOL UPDATE DATA -->
+                            <button onclick="openUpdateModal('${item.NIM}')" title="Update Data" 
+                                class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                                 <i class="fa-solid fa-pen-to-square"></i>
+                                <span>Update Data</span>
                             </button>
-                            <button onclick="deleteData('${item.NIM}', '${item.Nama}')" title="Hapus Data" class="p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition">
+                            <!-- TOMBOL HAPUS DATA -->
+                            <button onclick="deleteData('${item.NIM}', '${item.Nama}')" title="Hapus Data" 
+                                class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                                 <i class="fa-solid fa-trash"></i>
+                                <span>Hapus Data</span>
                             </button>
                         </div>
                     </td>
@@ -435,44 +341,20 @@
             });
         }
 
-        // Stats Update
-        function updateStats(data) {
-            document.getElementById('statTotal').textContent = data.length;
-            const prodiSet = new Set(data.map(d => d.Prodi).filter(Boolean));
-            document.getElementById('statProdi').textContent = prodiSet.size;
-        }
-
-        // Search Filter
+        // Pencarian Filter
         function filterData() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = rawStudentData.filter(item => 
                 (item.Nama && item.Nama.toLowerCase().includes(query)) ||
-                (item.NIM && item.NIM.toString().toLowerCase().includes(query)) ||
-                (item.Prodi && item.Prodi.toLowerCase().includes(query))
+                (item.NIM && item.NIM.toString().toLowerCase().includes(query))
             );
             renderTable(filtered);
         }
 
-        // Modal Controls (Tambah vs Edit)
-        function openAddModal() {
-            isEditMode = false;
-            document.getElementById('modalTitleText').textContent = 'Tambah Data Mahasiswa';
-            document.getElementById('modalIcon').className = 'fa-solid fa-user-plus text-indigo-600';
-            document.getElementById('submitBtnText').textContent = 'Simpan Data';
-            document.getElementById('addForm').reset();
-            document.getElementById('editOriginalNIM').value = '';
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-            document.getElementById('dataModal').classList.remove('hidden');
-        }
-
-        function openEditModal(nim) {
+        // Modal Update Data
+        function openUpdateModal(nim) {
             const student = rawStudentData.find(item => item.NIM == nim);
             if (!student) return;
-
-            isEditMode = true;
-            document.getElementById('modalTitleText').textContent = 'Edit Data Mahasiswa';
-            document.getElementById('modalIcon').className = 'fa-solid fa-user-pen text-amber-600';
-            document.getElementById('submitBtnText').textContent = 'Perbarui Data';
 
             document.getElementById('editOriginalNIM').value = student.NIM;
             document.getElementById('inputNama').value = student.Nama || '';
@@ -480,31 +362,20 @@
             document.getElementById('inputKelas').value = student.Kelas || '';
             document.getElementById('inputProdi').value = student.Prodi || '';
 
-            // Pratinjau foto lama jika ada
-            const directImgUrl = getDirectDriveImageUrl(student.Foto);
-            if (directImgUrl) {
-                document.getElementById('imagePreview').src = directImgUrl;
-                document.getElementById('imageFileName').textContent = 'Foto saat ini';
-                document.getElementById('imagePreviewContainer').classList.remove('hidden');
-            } else {
-                document.getElementById('imagePreviewContainer').classList.add('hidden');
-            }
-
-            document.getElementById('dataModal').classList.remove('hidden');
+            document.getElementById('updateModal').classList.remove('hidden');
         }
 
         function closeModal() {
-            document.getElementById('dataModal').classList.add('hidden');
-            document.getElementById('addForm').reset();
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            document.getElementById('updateModal').classList.add('hidden');
+            document.getElementById('updateForm').reset();
         }
 
-        // Process Upload & Submit (Tambah / Edit)
-        async function submitData(e) {
+        // Eksekusi Update Data
+        async function submitUpdate(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengupdate...`;
 
             try {
                 const fileInput = document.getElementById('inputFoto');
@@ -515,7 +386,7 @@
                 }
 
                 const payload = {
-                    action: isEditMode ? 'update' : 'create',
+                    action: 'update',
                     originalNIM: document.getElementById('editOriginalNIM').value,
                     Nama: document.getElementById('inputNama').value,
                     NIM: document.getElementById('inputNIM').value,
@@ -535,16 +406,16 @@
                 loadData();
             } catch (err) {
                 console.error(err);
-                alert('Gagal menyimpan data.');
+                alert('Gagal mengupdate data.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>${isEditMode ? 'Perbarui Data' : 'Simpan Data'}</span>`;
+                submitBtn.innerHTML = `<span>Update Data</span>`;
             }
         }
 
-        // Process Hapus Data
+        // Eksekusi Hapus Data
         async function deleteData(nim, nama) {
-            if (!confirm(`Apakah Anda yakin ingin menghapus data mahasiswa:\n${nama} (${nim})?`)) {
+            if (!confirm(`Konfirmasi Hapus Data:\nApakah Anda yakin ingin menghapus data "${nama}" (${nim}) dari Google Sheets?`)) {
                 return;
             }
 
@@ -553,7 +424,7 @@
                 <tr>
                     <td colspan="5" class="px-6 py-8 text-center text-slate-400">
                         <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-indigo-600"></i>
-                        <p class="text-sm font-medium">Menghapus data mahasiswa...</p>
+                        <p class="text-sm font-medium">Menghapus data dari Google Sheets...</p>
                     </td>
                 </tr>
             `;

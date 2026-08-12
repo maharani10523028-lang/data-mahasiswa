@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Mahasiswa</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .form-container { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #fafafa; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+        button:hover { background-color: #218838; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Data Mahasiswa</h1>
+
+    <div class="form-container">
+        <h3>Tambah Data Baru</h3>
+        <form id="mahasiswaForm">
+            <div class="form-group">
+                <label>Nama:</label>
+                <input type="text" id="Nama" name="Nama" required>
+            </div>
+            <div class="form-group">
+                <label>NIM:</label>
+                <input type="text" id="NIM" name="NIM" required>
+            </div>
+            <div class="form-group">
+                <label>Prodi:</label>
+                <input type="text" id="Prodi" name="Prodi" required>
+            </div>
+            <div class="form-group">
+                <label>Kelas:</label>
+                <input type="text" id="Kelas" name="Kelas" required>
+            </div>
+            <div class="form-group">
+                <label>Link Foto (URL G-Drive):</label>
+                <input type="url" id="Foto" name="Foto">
+            </div>
+            <button type="submit" id="submitBtn">Simpan Data</button>
+        </form>
+    </div>
+
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>NIM</th>
+                <th>Prodi</th>
+                <th>Kelas</th>
+                <th>Foto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // MASUKKAN URL WEB APP ANDA DI SINI
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwVuF9sRqFfQVxjHw224Xaz4aYO8We92Uk4n_GoNa8dfPkga7nXageH7YdZq60BGkhs/exec'; 
+    const form = document.forms['mahasiswaForm'];
+    const tbody = document.querySelector('#dataTable tbody');
+
+    // Mengambil data dari Google Sheet (READ)
+    function loadData() {
+        fetch(scriptURL)
+            .then(response => response.json())
+            .then(result => {
+                tbody.innerHTML = '';
+                if (result.data && result.data.length > 0) {
+                    result.data.forEach(row => {
+                        let tr = document.createElement('tr');
+                        // Menangani link foto dari data Excel
+                        let fotoHtml = row.Foto ? `<a href="${row.Foto}" target="_blank">Lihat Foto</a>` : '-';
+                        
+                        tr.innerHTML = `
+                            <td>${row.Nama}</td>
+                            <td>${row.NIM}</td>
+                            <td>${row.Prodi}</td>
+                            <td>${row.Kelas}</td>
+                            <td>${fotoHtml}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada data</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Gagal memuat data!</td></tr>';
+            });
+    }
+
+    // Memuat data saat web pertama kali dibuka
+    loadData();
+
+    // Menambah data ke Google Sheet (CREATE)
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.textContent = 'Menyimpan...';
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                alert('Data berhasil disimpan ke Spreadsheet!');
+                form.reset();
+                loadData(); // Muat ulang tabel
+            })
+            .catch(error => console.error('Error!', error.message))
+            .finally(() => {
+                submitBtn.textContent = 'Simpan Data';
+                submitBtn.disabled = false;
+            });
+    });
+</script>
+
+</body>
+</html>

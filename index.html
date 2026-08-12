@@ -166,16 +166,15 @@
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-semibold tracking-wider border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-3.5">Mahasiswa</th>
+                                <th class="px-6 py-3.5">Nama Mahasiswa</th>
                                 <th class="px-6 py-3.5">NIM</th>
                                 <th class="px-6 py-3.5">Program Studi</th>
                                 <th class="px-6 py-3.5">Kelas</th>
-                                <th class="px-6 py-3.5 text-center">Berkas Foto</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-slate-200 bg-white">
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-400">
+                                <td colspan="4" class="px-6 py-8 text-center text-slate-400">
                                     <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-indigo-600"></i>
                                     <p class="text-sm font-medium">Memuat data mahasiswa...</p>
                                 </td>
@@ -249,9 +248,19 @@
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         // 1. URL Web App Google Apps Script Anda (GANTI DENGAN URL APPS SCRIPT ANDA)
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwVuF9sRqFfQVxjHw224Xaz4aYO8We92Uk4n_GoNa8dfPkga7nXageH7YdZq60BGkhs/exec';
+        const scriptURL = 'GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA';
 
         let rawStudentData = [];
+
+        // Helper function: Ekstrak ID dari Google Drive URL
+        function getDirectDriveImageUrl(url) {
+            if (!url) return null;
+            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w300`;
+            }
+            return url;
+        }
 
         // 2. Authentication Logic
         function handleLogin(e) {
@@ -259,7 +268,6 @@
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
 
-            // Simple client-side auth validation
             if (u === 'admin' && p === 'admin123') {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 showDashboard();
@@ -290,7 +298,7 @@
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-slate-400">
+                    <td colspan="4" class="px-6 py-8 text-center text-slate-400">
                         <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-indigo-600"></i>
                         <p class="text-sm font-medium">Memuat data dari Google Sheets...</p>
                     </td>
@@ -305,14 +313,14 @@
                         renderTable(rawStudentData);
                         updateStats(rawStudentData);
                     } else {
-                        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-amber-600">Tidak ada data ditemukan.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-amber-600">Tidak ada data ditemukan.</td></tr>`;
                     }
                 })
                 .catch(err => {
                     console.error(err);
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="5" class="px-6 py-6 text-center text-red-500 font-medium">
+                            <td colspan="4" class="px-6 py-6 text-center text-red-500 font-medium">
                                 Gagal mengambil data. Pastikan URL Apps Script sudah benar & izin akses diset 'Anyone'.
                             </td>
                         </tr>
@@ -320,13 +328,13 @@
                 });
         }
 
-        // 4. Render Table Row & Badges
+        // 4. Render Table Row (Foto berada di dalam kolom Nama)
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400">Data mahasiswa tidak cocok dengan pencarian.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">Data mahasiswa tidak cocok dengan pencarian.</td></tr>`;
                 return;
             }
 
@@ -334,20 +342,21 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 
-                // Initial avatar placeholder from name
-                const initial = item.Nama ? item.Nama.charAt(0).toUpperCase() : '?';
+                const directImgUrl = getDirectDriveImageUrl(item.Foto);
+                const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.Nama || 'Mahasiswa')}&background=e0e7ff&color=3730a3&bold=true`;
 
-                let fotoButton = item.Foto 
-                    ? `<a href="${item.Foto}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full transition">
-                        <i class="fa-solid fa-image"></i> Lihat Foto
+                const fotoElement = directImgUrl 
+                    ? `<a href="${item.Foto}" target="_blank" title="Buka di Google Drive" class="inline-block shrink-0 group">
+                        <img src="${directImgUrl}" 
+                             alt="${item.Nama}" 
+                             class="w-10 h-10 rounded-full object-cover border-2 border-indigo-200 group-hover:border-indigo-600 shadow-sm transition transform group-hover:scale-105"
+                             onerror="this.onerror=null; this.src='${defaultAvatar}';">
                        </a>`
-                    : `<span class="text-xs text-slate-400 italic">Tidak ada</span>`;
+                    : `<img src="${defaultAvatar}" alt="${item.Nama}" class="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0">`;
 
                 tr.innerHTML = `
-                    <td class="px-6 py-4 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
-                            ${initial}
-                        </div>
+                    <td class="px-6 py-3 flex items-center gap-3">
+                        ${fotoElement}
                         <span class="font-semibold text-slate-800">${item.Nama || '-'}</span>
                     </td>
                     <td class="px-6 py-4 font-mono text-xs font-semibold text-slate-600">${item.NIM || '-'}</td>
@@ -361,7 +370,6 @@
                             ${item.Kelas || '-'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-center">${fotoButton}</td>
                 `;
                 tbody.appendChild(tr);
             });

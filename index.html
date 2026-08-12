@@ -442,48 +442,75 @@
         }
 
         async function submitForm(e) {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+    e.preventDefault();
 
-            try {
-                const fileInput = document.getElementById('inputFoto');
-                let fileObj = null;
+    const inputNIM = document.getElementById('inputNIM').value.trim();
+    const originalNIM = document.getElementById('editOriginalNIM').value.trim();
 
-                if (fileInput.files.length > 0) {
-                    fileObj = await readFileAsBase64(fileInput.files[0]);
-                }
-
-                const payload = {
-                    action: isEditMode ? 'update' : 'create',
-                    originalNIM: document.getElementById('editOriginalNIM').value,
-                    Nama: document.getElementById('inputNama').value,
-                    NIM: document.getElementById('inputNIM').value,
-                    Prodi: document.getElementById('inputProdi').value,
-                    Kelas: document.getElementById('inputKelas').value,
-                    fileData: fileObj ? fileObj.base64 : '',
-                    fileType: fileObj ? fileObj.type : '',
-                    fileName: fileObj ? fileObj.name : ''
-                };
-
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-
-                closeModal();
-                loadData();
-            } catch (err) {
-                console.error(err);
-                alert('Gagal memproses data.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>${isEditMode ? 'Perbarui Data' : 'Simpan Data'}</span>`;
+    // --- VALIDASI DUPLIKASI NIM DI FRONTEND ---
+    if (!isEditMode) {
+        // Mode Tambah: Cek apakah NIM sudah ada di data lokal
+        const isExist = rawStudentData.some(item => item.NIM && item.NIM.toString().trim() === inputNIM);
+        if (isExist) {
+            alert(`Peringatan: NIM "${inputNIM}" sudah terdaftar! Tidak boleh menambahkan NIM yang sama.`);
+            return;
+        }
+    } else {
+        // Mode Update: Jika NIM diubah, cek apakah NIM baru sudah digunakan mahasiswa lain
+        if (inputNIM !== originalNIM) {
+            const isExist = rawStudentData.some(item => item.NIM && item.NIM.toString().trim() === inputNIM);
+            if (isExist) {
+                alert(`Peringatan: NIM "${inputNIM}" sudah digunakan oleh mahasiswa lain!`);
+                return;
             }
         }
+    }
 
-        // --- 5. FITUR HAPUS DATA ---
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+
+    try {
+        const fileInput = document.getElementById('inputFoto');
+        let fileObj = null;
+
+        if (fileInput.files.length > 0) {
+            fileObj = await readFileAsBase64(fileInput.files[0]);
+        }
+
+        const payload = {
+            action: isEditMode ? 'update' : 'create',
+            originalNIM: originalNIM,
+            Nama: document.getElementById('inputNama').value,
+            NIM: inputNIM,
+            Prodi: document.getElementById('inputProdi').value,
+            Kelas: document.getElementById('inputKelas').value,
+            fileData: fileObj ? fileObj.base64 : '',
+            fileType: fileObj ? fileObj.type : '',
+            fileName: fileObj ? fileObj.name : ''
+        };
+
+        const res = await fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        // Jika backend mengembalikan status error
+        if (res.status === 'error') {
+            alert('Gagal: ' + res.message);
+            return;
+        }
+
+        closeModal();
+        loadData();
+    } catch (err) {
+        console.error(err);
+        alert('Gagal memproses data.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>${isEditMode ? 'Perbarui Data' : 'Simpan Data'}</span>`;
+    }
+}        // --- 5. FITUR HAPUS DATA ---
         async function deleteData(nim, nama) {
             if (!confirm(`Konfirmasi Hapus Data:\nApakah Anda yakin ingin menghapus data "${nama}" (${nim})?`)) {
                 return;
